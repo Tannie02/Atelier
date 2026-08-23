@@ -15,11 +15,3 @@ Outfit Picker is an AI-powered smart wardrobe and outfit recommendation platform
 
 ---
 
-## ⚡ Quickstart Guide
-
-### Launch the Application
-Run the startup script:
-```powershell
-python run_app.py
-```
-Open your browser at: **[http://localhost:8000](http://localhost:8000)**
