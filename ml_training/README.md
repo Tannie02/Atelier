@@ -36,9 +36,9 @@ $$\mathcal{L} = -\frac{1}{N} \sum_{i=1}^{N} \left[ y_i \log(\hat{y}_i) + (1 - y_
 ## 🚀 2. How to Train Your Model (Step-by-Step)
 
 ### Step 1: Open Your Terminal
-Navigate to the project root or the `ml_training` directory:
-```powershell
-cd C:\Users\taran\.gemini\antigravity\scratch\outfit_picker\ml_training
+Navigate to the `ml_training` directory:
+```bash
+cd ml_training
 ```
 
 ### Step 2: Run Training
