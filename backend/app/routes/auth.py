@@ -193,3 +193,26 @@ def get_current_user_profile(user: User = Depends(get_current_user), db: Session
         total_looks_curated=look_count,
         created_at=user.created_at
     )
+
+@router.get("/users")
+def list_registered_users(db: Session = Depends(get_db)):
+    """
+    Returns the list of everyone who created an account.
+    Open in browser: /api/auth/users
+    """
+    users = db.query(User).order_by(User.id.desc()).all()
+    user_list = []
+    for u in users:
+        closet_count = db.query(ClothingItem).filter(ClothingItem.user_id == u.id).count()
+        user_list.append({
+            "id": u.id,
+            "full_name": u.full_name,
+            "email": u.email,
+            "style_preference": u.style_preference,
+            "pieces_uploaded": closet_count,
+            "joined_at": u.created_at.strftime("%b %d, %Y %I:%M %p") if u.created_at else "N/A"
+        })
+    return {
+        "total_registered_users": len(user_list),
+        "users": user_list
+    }
