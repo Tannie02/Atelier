@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Atelier</title>
+    <link rel="icon" type="image/png" href="/static/images/logo_emblem.png">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Fonts: Plus Jakarta Sans & Playfair Display -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Luxury Styling -->
+    <link rel="stylesheet" href="/static/css/custom.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        serif: ['"Playfair Display"', 'Georgia', 'serif'],
+                    },
+                    colors: {
+                        sand: '#FAF9F5',
+                        charcoal: '#18181B',
+                        champagne: '#C5A880',
+                        cream: '#F4EBD9',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-[#FAF9F5] text-zinc-900 font-sans antialiased min-h-screen flex flex-col selection:bg-zinc-900 selection:text-white">
+
+    <!-- Top Luxury Navigation Header -->
+    <header class="sticky top-0 z-40 bg-[#FAF9F5]/90 backdrop-blur-md border-b border-[#EAE7DE]">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <!-- Brand Identity with Logo -->
+            <div class="flex items-center gap-3 cursor-pointer group" onclick="switchTab('wardrobe')">
+                <img src="/static/images/logo_emblem.png" alt="ATELIER STUDIO Logo" class="h-11 w-11 rounded-xl object-contain bg-zinc-950 p-1 border border-amber-900/30 shadow-xs group-hover:scale-105 transition">
+                <div>
+                    <span class="font-serif text-xl font-bold tracking-tight text-zinc-900 block leading-none">ATELIER</span>
+                    <span class="text-[9px] font-bold tracking-widest uppercase text-amber-700 mt-1 block">Personal AI Stylist</span>
+                </div>
+            </div>
+
+            <!-- Navigation Tabs -->
+            <nav class="hidden md:flex items-center gap-1.5 bg-[#EFECE6]/80 p-1.5 rounded-2xl border border-[#E3DFD5]">
+                <button data-tab="wardrobe" class="nav-btn px-5 py-2 rounded-xl text-xs font-semibold bg-zinc-900 text-white shadow-xs transition flex items-center gap-2">
+                    <i data-lucide="layout-grid" class="w-3.5 h-3.5"></i> My Closet
+                </button>
+                <button data-tab="add_item" class="nav-btn px-5 py-2 rounded-xl text-xs font-semibold text-zinc-600 hover:text-zinc-900 hover:bg-white/60 transition flex items-center gap-2">
+                    <i data-lucide="plus-circle" class="w-3.5 h-3.5"></i> Add Pieces
+                </button>
+                <button data-tab="recommender" class="nav-btn px-5 py-2 rounded-xl text-xs font-semibold text-zinc-600 hover:text-zinc-900 hover:bg-white/60 transition flex items-center gap-2">
+                    <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-600"></i> Daily Stylist
+                </button>
+                <button data-tab="analytics" class="nav-btn px-5 py-2 rounded-xl text-xs font-semibold text-zinc-600 hover:text-zinc-900 hover:bg-white/60 transition flex items-center gap-2">
+                    <i data-lucide="compass" class="w-3.5 h-3.5"></i> Style DNA
+                </button>
+            </nav>
+
+            <!-- Auth & User Profile Container -->
+            <div class="flex items-center gap-3">
+                <!-- Logged Out State -->
+                <div id="auth-logged-out" class="flex items-center gap-2">
+                    <button onclick="openAuthModal('login')" class="px-4 py-2 text-xs font-bold text-zinc-700 hover:text-zinc-900 hover:bg-white rounded-xl transition border border-transparent hover:border-[#EAE7DE]">
+                        Sign In
+                    </button>
+                    <button onclick="openAuthModal('register')" class="px-4 py-2 bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-bold rounded-xl shadow-xs transition">
+                        Create Account
+                    </button>
+                </div>
+
+                <!-- Logged In State -->
+                <div id="auth-logged-in" class="hidden flex items-center gap-3">
+                    <div class="relative">
+                        <button id="user-profile-menu-btn" onclick="toggleUserDropdown(event)" class="flex items-center gap-2.5 px-3.5 py-1.5 bg-white border border-[#EAE7DE] rounded-full shadow-2xs hover:border-zinc-400 transition cursor-pointer">
+                            <span id="user-avatar-initial" class="w-6 h-6 rounded-full bg-zinc-900 text-amber-200 font-bold text-xs flex items-center justify-center">T</span>
+                            <span id="user-name-display" class="text-xs font-bold text-zinc-800 truncate max-w-[110px]">Taran</span>
+                            <i data-lucide="chevron-down" class="w-3.5 h-3.5 text-zinc-400"></i>
+                        </button>
+                        
+                        <!-- Dropdown Menu -->
+                        <div id="user-dropdown-menu" class="absolute right-0 mt-2 w-52 bg-white rounded-2xl border border-[#EAE7DE] shadow-xl py-2 hidden z-50">
+                            <div class="px-4 py-2.5 border-b border-[#F0EDE6]">
+                                <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Signed in as</span>
+                                <span id="user-email-display" class="text-xs font-bold text-zinc-900 truncate block">user@atelier.com</span>
+                            </div>
+                            <button onclick="switchTab('analytics'); closeUserDropdown();" class="w-full text-left px-4 py-2.5 text-xs font-semibold text-zinc-700 hover:bg-[#FAF9F5] flex items-center gap-2.5 transition">
+                                <i data-lucide="user" class="w-4 h-4 text-zinc-400"></i> My Style Profile
+                            </button>
+                            <button onclick="handleLogout()" class="w-full text-left px-4 py-2.5 text-xs font-bold text-rose-600 hover:bg-rose-50 flex items-center gap-2.5 transition border-t border-[#F0EDE6] mt-1">
+                                <i data-lucide="log-out" class="w-4 h-4 text-rose-500"></i> Sign Out
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Viewport -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-10">
+
+        <!-- =========================================================================
+             SECTION 1: MY CLOSET (THE WARDROBE GALLERY)
+             ========================================================================= -->
+        <section id="section-wardrobe" class="tab-section tab-transition">
+            <!-- Header Banner -->
+            <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10 pb-6 border-b border-[#EAE7DE]">
+                <div>
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-semibold gold-badge mb-3">
+                        <span>✨ Your Capsule Collection</span>
+                    </div>
+                    <h1 class="font-serif text-3xl sm:text-4xl font-bold text-zinc-900 tracking-tight">The Digital Closet</h1>
+                    <p class="text-sm text-zinc-500 mt-1 max-w-xl">Every piece digitized with intelligent fabric detection, custom warmth ratings, and color harmony mapping.</p>
+                </div>
+
+                <!-- Actions -->
+                <div class="flex items-center gap-3">
+                    <span id="wardrobe-count" class="text-xs font-bold text-zinc-500 bg-white px-3 py-2 rounded-xl border border-[#EAE7DE]">9 Pieces</span>
+                    <button onclick="switchTab('add_item')" class="inline-flex items-center gap-2 px-5 py-2.5 bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-bold rounded-xl shadow-sm transition">
+                        <i data-lucide="plus" class="w-4 h-4"></i> Add New Piece
+                    </button>
+                </div>
+            </div>
+
+            <!-- Filter Controls -->
+            <div class="flex items-center justify-between flex-wrap gap-4 mb-8">
+                <div class="flex items-center gap-2 overflow-x-auto pb-2">
+                    <button data-cat="all" onclick="filterWardrobe('all')" class="cat-pill px-4 py-2 rounded-xl text-xs font-bold bg-zinc-900 text-white shadow-xs transition">All Pieces</button>
+                    <button data-cat="top" onclick="filterWardrobe('top')" class="cat-pill px-4 py-2 rounded-xl text-xs font-semibold bg-white text-zinc-600 border border-[#EAE7DE] hover:border-zinc-300 transition">Tops & Shirts</button>
+                    <button data-cat="bottom" onclick="filterWardrobe('bottom')" class="cat-pill px-4 py-2 rounded-xl text-xs font-semibold bg-white text-zinc-600 border border-[#EAE7DE] hover:border-zinc-300 transition">Trousers & Denim</button>
+                    <button data-cat="footwear" onclick="filterWardrobe('footwear')" class="cat-pill px-4 py-2 rounded-xl text-xs font-semibold bg-white text-zinc-600 border border-[#EAE7DE] hover:border-zinc-300 transition">Footwear</button>
+                    <button data-cat="outerwear" onclick="filterWardrobe('outerwear')" class="cat-pill px-4 py-2 rounded-xl text-xs font-semibold bg-white text-zinc-600 border border-[#EAE7DE] hover:border-zinc-300 transition">Jackets & Coats</button>
+                </div>
+            </div>
+
+            <!-- Wardrobe Grid -->
+            <div id="wardrobe-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+                <!-- Populated via JavaScript -->
+            </div>
+        </section>
+
+
+        <!-- =========================================================================
+             SECTION 2: ADD PIECES (PHOTO DIGITIZER)
+             ========================================================================= -->
+        <section id="section-add_item" class="tab-section tab-transition hidden max-w-3xl mx-auto">
+            <div class="text-center mb-10">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-semibold gold-badge mb-3">
+                    <span>📷 Seamless Digitization</span>
+                </div>
+                <h2 class="font-serif text-3xl font-bold text-zinc-900 tracking-tight">Add Pieces to Your Closet</h2>
+                <p class="text-sm text-zinc-500 mt-2 max-w-md mx-auto">Upload a smartphone photo. Our intelligent visual scanner automatically detects the garment type, extracts true-tone color swatches, and maps aesthetic attributes.</p>
+            </div>
+
+            <!-- Luxury Upload Dropzone -->
+            <div id="upload-dropzone" class="border-2 border-dashed border-[#DCD7CB] hover:border-zinc-900 bg-white rounded-3xl p-12 text-center cursor-pointer transition duration-300 shadow-2xs group">
+                <input type="file" id="file-input" accept="image/*" class="hidden">
+                <div class="w-16 h-16 rounded-2xl bg-[#FAF9F5] text-zinc-800 flex items-center justify-center mx-auto mb-4 group-hover:scale-105 transition duration-300 border border-[#EAE7DE]">
+                    <i data-lucide="camera" class="w-7 h-7"></i>
+                </div>
+                <h4 class="font-serif text-lg font-bold text-zinc-900">Upload your clothing photo</h4>
+                <p class="text-xs text-zinc-500 mt-1">Drag and drop here, or <span class="text-zinc-900 font-bold underline">browse files</span></p>
+                <div class="mt-5 inline-flex items-center gap-2 text-[11px] font-semibold text-zinc-600 bg-[#FAF9F5] px-4 py-1.5 rounded-full border border-[#EAE7DE]">
+                    <span>✨ Instant style classification & color harmony extraction</span>
+                </div>
+            </div>
+
+            <!-- Loading State -->
+            <div id="upload-loading" class="hidden text-center py-20 bg-white rounded-3xl border border-[#EAE7DE]">
+                <div class="inline-block w-10 h-10 border-3 border-zinc-900 border-t-transparent rounded-full animate-spin mb-4"></div>
+                <h4 class="font-serif text-lg font-bold text-zinc-900">Scanning Garment Details...</h4>
+                <p class="text-xs text-zinc-400 mt-1">Analyzing texture, silhouette, and dominant color tones</p>
+            </div>
+
+            <!-- Refined Review Card -->
+            <div id="tag-preview-card" class="hidden bg-white rounded-3xl border border-[#EAE7DE] shadow-sm p-8">
+                <div class="flex items-center justify-between pb-4 border-b border-[#F0EDE6] mb-6">
+                    <div class="flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                        <h3 class="font-serif text-lg font-bold text-zinc-900">Piece Details & Tagging</h3>
+                    </div>
+                    <button onclick="cancelUpload()" class="text-xs text-zinc-400 hover:text-zinc-700 font-medium">Cancel</button>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <!-- Garment Preview Frame -->
+                    <div class="flex flex-col items-center">
+                        <div class="w-full aspect-square rounded-2xl bg-[#FAF9F5] overflow-hidden border border-[#EAE7DE]">
+                            <img id="preview-img" src="" alt="Garment preview" class="w-full h-full object-cover">
+                        </div>
+                        <span class="text-[11px] text-zinc-400 mt-2 text-center font-medium">Captured piece</span>
+                    </div>
+
+                    <!-- Attributes Editor -->
+                    <div class="md:col-span-2 space-y-4">
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-bold text-zinc-700 mb-1">Wardrobe Category</label>
+                                <select id="preview-category-select" class="w-full text-xs font-medium bg-[#FAF9F5] border border-[#EAE7DE] rounded-xl px-3.5 py-2.5 focus:outline-hidden focus:border-zinc-900">
+                                    <option value="top">Top</option>
+                                    <option value="bottom">Bottom</option>
+                                    <option value="footwear">Footwear</option>
+                                    <option value="outerwear">Outerwear</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-zinc-700 mb-1">Garment Style</label>
+                                <input type="text" id="preview-subcategory-input" class="w-full text-xs font-medium bg-[#FAF9F5] border border-[#EAE7DE] rounded-xl px-3.5 py-2.5 focus:outline-hidden focus:border-zinc-900">
+                            </div>
+                        </div>
+
+                        <!-- Detected Style Suggestions -->
+                        <div>
+                            <label class="block text-[11px] font-bold text-zinc-500 uppercase tracking-wider mb-2">Detected Style Suggestions:</label>
+                            <div id="candidate-tags-container" class="flex flex-wrap gap-2">
+                                <!-- Populated dynamically -->
+                            </div>
+                        </div>
+
+                        <!-- Dominant Color Swatches -->
+                        <div>
+                            <label class="block text-xs font-bold text-zinc-700 mb-1">Identified Palette</label>
+                            <div class="flex items-center gap-2">
+                                <div id="color-preview-circle" class="w-8 h-8 rounded-xl border border-black/10 shadow-xs flex-shrink-0"></div>
+                                <input type="text" id="preview-color-name" class="flex-1 text-xs font-medium bg-[#FAF9F5] border border-[#EAE7DE] rounded-xl px-3 py-2">
+                                <input type="text" id="preview-color-hex" class="w-24 text-xs font-mono text-zinc-400 bg-[#FAF9F5] border border-[#EAE7DE] rounded-xl px-2 py-2 text-center">
+                            </div>
+                            <div id="color-swatches-container" class="flex flex-wrap gap-2 mt-2">
+                                <!-- Swatches -->
+                            </div>
+                        </div>
+
+                        <!-- Warmth Rating -->
+                        <div>
+                            <div class="flex justify-between text-xs font-bold text-zinc-700 mb-1">
+                                <span>Weather Warmth Level</span>
+                                <span id="warmth-val-display" class="text-amber-700 font-bold">Level 2 (Mild/Warm)</span>
+                            </div>
+                            <input type="range" id="preview-warmth" min="1" max="5" value="2" step="1" oninput="updateWarmthLabel(this.value)" class="w-full accent-zinc-900">
+                            <div class="flex justify-between text-[10px] text-zinc-400 mt-0.5">
+                                <span>Light Summer (1)</span>
+                                <span>Deep Winter (5)</span>
+                            </div>
+                        </div>
+
+                        <!-- Formality Level -->
+                        <div>
+                            <div class="flex justify-between text-xs font-bold text-zinc-700 mb-1">
+                                <span>Dress Code Formality</span>
+                                <span id="formality-val-display" class="text-zinc-900 font-bold">Level 2/5</span>
+                            </div>
+                            <input type="range" id="preview-formality" min="1" max="5" value="2" step="1" oninput="updateFormalityLabel(this.value)" class="w-full accent-zinc-900">
+                            <div class="flex justify-between text-[10px] text-zinc-400 mt-0.5">
+                                <span>Relaxed / Casual (1)</span>
+                                <span>Black-Tie / Formal (5)</span>
+                            </div>
+                        </div>
+
+                        <!-- Notes -->
+                        <div>
+                            <label class="block text-xs font-bold text-zinc-700 mb-1">Personal Notes (Optional)</label>
+                            <input type="text" id="preview-notes" placeholder="e.g., Favorite linen piece, slim cut" class="w-full text-xs font-medium bg-[#FAF9F5] border border-[#EAE7DE] rounded-xl px-3 py-2">
+                        </div>
+
+                        <!-- Save CTA -->
+                        <div class="pt-3">
+                            <button id="confirm-save-item-btn" class="w-full py-3.5 bg-zinc-900 hover:bg-zinc-800 text-white text-xs font-bold rounded-xl shadow-sm transition flex items-center justify-center gap-2">
+                                <i data-lucide="check" class="w-4 h-4"></i> Save to Closet
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- =========================================================================
+             SECTION 3: DAILY STYLIST (OUTFIT RECOMMENDER & LOOKBOOK)
+             ========================================================================= -->
+        <section id="section-recommender" class="tab-section tab-transition hidden">
+            <!-- Header Banner -->
+            <div class="text-center max-w-2xl mx-auto mb-10">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-semibold gold-badge mb-3">
+                    <span>✨ Curated Editorial Styling</span>
+                </div>
+                <h2 class="font-serif text-3xl sm:text-4xl font-bold text-zinc-900 tracking-tight">Your Daily Outfit Lookbook</h2>
+                <p class="text-sm text-zinc-500 mt-2">Intelligently composed combinations matching your destination, occasion, and real-time weather conditions.</p>
+            </div>
+
+            <!-- Stylist Context Controls -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-10">
+                <!-- Occasion Selector -->
+                <div class="lg:col-span-2 bg-white rounded-3xl p-7 border border-[#EAE7DE] shadow-xs">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-serif text-lg font-bold text-zinc-900 flex items-center gap-2">
+                            <span>Where are you heading?</span>
+                        </h3>
+                        <span class="text-[11px] text-zinc-400 uppercase tracking-wider font-semibold">Select Occasion</span>
+                    </div>
+
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                        <button data-occasion="college" class="occasion-pill border-2 border-zinc-900 bg-zinc-900 text-white font-bold p-3.5 rounded-2xl text-left transition flex flex-col justify-between h-24 shadow-xs">
+                            <span class="text-xl">🎓</span>
+                            <div>
+                                <span class="text-xs font-bold block">Campus & Casual</span>
+                                <span class="text-[10px] text-zinc-300 block">Effortless everyday</span>
+                            </div>
+                        </button>
+                        <button data-occasion="casual_outing" class="occasion-pill border-2 border-[#EAE7DE] text-zinc-800 p-3.5 rounded-2xl text-left transition flex flex-col justify-between h-24 hover:border-zinc-400 bg-white">
+                            <span class="text-xl">☕</span>
+                            <div>
+                                <span class="text-xs font-bold block">Weekend & Cafe</span>
+                                <span class="text-[10px] text-zinc-400 block">Relaxed chic</span>
+                            </div>
+                        </button>
+                        <button data-occasion="party" class="occasion-pill border-2 border-[#EAE7DE] text-zinc-800 p-3.5 rounded-2xl text-left transition flex flex-col justify-between h-24 hover:border-zinc-400 bg-white">
+                            <span class="text-xl">🍸</span>
+                            <div>
+                                <span class="text-xs font-bold block">Night Out & Party</span>
+                                <span class="text-[10px] text-zinc-400 block">Statement styling</span>
+                            </div>
+                        </button>
+                        <button data-occasion="formal" class="occasion-pill border-2 border-[#EAE7DE] text-zinc-800 p-3.5 rounded-2xl text-left transition flex flex-col justify-between h-24 hover:border-zinc-400 bg-white">
+                            <span class="text-xl">💼</span>
+                            <div>
+                                <span class="text-xs font-bold block">Executive & Formal</span>
+                                <span class="text-[10px] text-zinc-400 block">Tailored elegance</span>
+                            </div>
+                        </button>
+                        <button data-occasion="date_night" class="occasion-pill border-2 border-[#EAE7DE] text-zinc-800 p-3.5 rounded-2xl text-left transition flex flex-col justify-between h-24 hover:border-zinc-400 bg-white">
+                            <span class="text-xl">✨</span>
+                            <div>
+                                <span class="text-xs font-bold block">Date Night</span>
+                                <span class="text-[10px] text-zinc-400 block">Elevated charm</span>
+                            </div>
+                        </button>
+                        <button data-occasion="gym" class="occasion-pill border-2 border-[#EAE7DE] text-zinc-800 p-3.5 rounded-2xl text-left transition flex flex-col justify-between h-24 hover:border-zinc-400 bg-white">
+                            <span class="text-xl">🏋️</span>
+                            <div>
+                                <span class="text-xs font-bold block">Active & Gym</span>
+                                <span class="text-[10px] text-zinc-400 block">Performance fit</span>
+                            </div>
+                        </button>
+                        <button data-occasion="home" class="occasion-pill border-2 border-[#EAE7DE] text-zinc-800 p-3.5 rounded-2xl text-left transition flex flex-col justify-between h-24 hover:border-zinc-400 bg-white">
+                            <span class="text-xl">🛋️</span>
+                            <div>
+                                <span class="text-xs font-bold block">Home & Lounge</span>
+                                <span class="text-[10px] text-zinc-400 block">Pure comfort</span>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Weather Radar & Generate Action -->
+                <div class="bg-zinc-900 rounded-3xl p-7 text-white shadow-md flex flex-col justify-between border border-zinc-800">
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center gap-2">
+                                <i data-lucide="cloud-sun" class="w-4 h-4 text-amber-300"></i>
+                                <span class="text-xs font-bold uppercase tracking-wider text-zinc-300">Destination Weather</span>
+                            </div>
+                            <button onclick="useGpsLocation()" class="text-[11px] text-amber-200 hover:text-white flex items-center gap-1 font-semibold underline">
+                                <i data-lucide="navigation" class="w-3 h-3"></i> Current Location
+                            </button>
+                        </div>
+
+                        <!-- City Preset / Search -->
+                        <div class="relative mb-3">
+                            <input type="text" id="weather-city-input" placeholder="Search City (e.g. Paris, New York, Tokyo)" class="w-full bg-zinc-800/80 border border-zinc-700 rounded-xl px-3.5 py-2 text-xs text-white placeholder-zinc-400 focus:outline-hidden focus:border-amber-300">
+                        </div>
+
+                        <!-- Live Forecast Card -->
+                        <div id="weather-display-card" class="bg-zinc-800/60 rounded-2xl p-3.5 border border-zinc-700/60">
+                            <div class="text-xs text-zinc-300">Loading destination forecast...</div>
+                        </div>
+                    </div>
+
+                    <!-- Generate Button -->
+                    <button id="generate-outfits-btn" class="w-full mt-5 py-4 bg-gradient-to-r from-amber-200 via-amber-100 to-amber-300 hover:from-amber-300 hover:to-amber-400 text-zinc-950 font-bold text-xs rounded-2xl shadow-lg transition flex items-center justify-center gap-2 uppercase tracking-wider">
+                        <i data-lucide="sparkles" class="w-4 h-4 text-zinc-900"></i> Curate Outfits
+                    </button>
+                </div>
+            </div>
+
+            <!-- Recommendation Results Grid -->
+            <div id="outfit-results-container">
+                <div class="py-20 text-center text-zinc-400">
+                    <div class="w-14 h-14 rounded-2xl bg-white text-zinc-800 flex items-center justify-center mx-auto mb-3 border border-[#EAE7DE] shadow-2xs">
+                        <i data-lucide="sparkles" class="w-6 h-6 text-amber-600"></i>
+                    </div>
+                    <h4 class="font-serif text-lg font-bold text-zinc-800">Your Lookbook Awaits</h4>
+                    <p class="text-xs text-zinc-400 max-w-sm mx-auto mt-1">Select an occasion and click "Curate Outfits" to reveal personalized suggestions.</p>
+                </div>
+            </div>
+        </section>
+
+
+        <!-- =========================================================================
+             SECTION 4: STYLE DNA & PERSONAL TASTE PROFILE
+             ========================================================================= -->
+        <section id="section-analytics" class="tab-section tab-transition hidden max-w-4xl mx-auto">
+            <div class="text-center mb-10">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-semibold gold-badge mb-3">
+                    <span>💎 Personalized Taste Profile</span>
+                </div>
+                <h2 class="font-serif text-3xl font-bold text-zinc-900 tracking-tight">Your Style DNA & Closet Insights</h2>
+                <p class="text-sm text-zinc-500 mt-2">A breakdown of your color palette, seasonal warmth balance, and learning progress.</p>
+            </div>
+
+            <div id="analytics-content" class="space-y-6">
+                <!-- Populated via JavaScript -->
+            </div>
+
+            <!-- AI Model Personalization Status Card -->
+            <div class="mt-8 bg-white p-7 rounded-3xl border border-[#EAE7DE] shadow-xs">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-[#F0EDE6]">
+                    <div>
+                        <h3 class="font-serif text-lg font-bold text-zinc-900">AI Stylist Personalization</h3>
+                        <p class="text-xs text-zinc-500 mt-1">Your styling engine learns your taste with every outfit rating.</p>
+                    </div>
+                    <div id="model-status-badge">
+                        <span class="text-zinc-800 bg-[#FAF9F5] px-3.5 py-1.5 rounded-full text-xs font-bold border border-[#EAE7DE]">Active Engine: Curated Style Match</span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 my-6">
+                    <div class="bg-[#FAF9F5] p-4 rounded-2xl border border-[#EAE7DE]">
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-zinc-500 block">Total Looks Rated</span>
+                        <span id="stat-total-feedback" class="font-serif text-2xl font-bold text-zinc-900 mt-1 block">0</span>
+                    </div>
+                    <div class="bg-emerald-50/70 p-4 rounded-2xl border border-emerald-100">
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-emerald-800 block">❤️ Looks You Loved</span>
+                        <span id="stat-likes" class="font-serif text-2xl font-bold text-emerald-900 mt-1 block">0</span>
+                    </div>
+                    <div class="bg-rose-50/70 p-4 rounded-2xl border border-rose-100">
+                        <span class="text-[11px] font-bold uppercase tracking-wider text-rose-800 block">👎 Passed Looks</span>
+                        <span id="stat-dislikes" class="font-serif text-2xl font-bold text-rose-900 mt-1 block">0</span>
+                    </div>
+                </div>
+
+                <div class="p-4 bg-[#FAF9F5] rounded-2xl border border-[#EAE7DE] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                        <span class="text-xs font-bold text-zinc-800 block">Personal Style Profile</span>
+                        <span class="text-[11px] text-zinc-500">Run <code>python ml_training/train.py</code> in terminal anytime to fine-tune your model on your latest likes.</span>
+                    </div>
+                    <button onclick="handleLogout()" class="px-4 py-2 bg-white hover:bg-rose-50 border border-[#EAE7DE] hover:border-rose-200 text-rose-600 text-xs font-bold rounded-xl transition flex items-center gap-1.5 shadow-2xs">
+                        <i data-lucide="log-out" class="w-3.5 h-3.5"></i> Sign Out
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- =========================================================================
+         LUXURY AUTH MODAL (SIGN IN / REGISTER)
+         ========================================================================= -->
+    <div id="auth-modal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full p-8 shadow-2xl border border-[#EAE7DE] relative tab-transition">
+            <!-- Close Button -->
+            <button onclick="closeAuthModal()" class="absolute top-6 right-6 text-zinc-400 hover:text-zinc-800 transition">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+
+            <!-- Brand Header -->
+            <div class="text-center mb-6">
+                <img src="/static/images/logo_emblem.png" alt="ATELIER" class="h-16 w-16 mx-auto mb-3 rounded-2xl shadow-md border border-amber-900/30 object-contain bg-zinc-950 p-2">
+                <h3 id="auth-modal-title" class="font-serif text-2xl font-bold text-zinc-900">Sign In to Your Closet</h3>
+                <p id="auth-modal-subtitle" class="text-xs text-zinc-500 mt-1">Access your personalized wardrobe and AI lookbook</p>
+            </div>
+
+            <!-- Tab Toggle -->
+            <div class="flex items-center bg-[#FAF9F5] p-1 rounded-2xl border border-[#EAE7DE] mb-6">
+                <button id="auth-tab-login" onclick="toggleAuthMode('login')" class="flex-1 py-2 text-xs font-bold rounded-xl bg-white text-zinc-900 shadow-xs transition">
+                    Sign In
+                </button>
+                <button id="auth-tab-register" onclick="toggleAuthMode('register')" class="flex-1 py-2 text-xs font-semibold rounded-xl text-zinc-500 hover:text-zinc-900 transition">
+                    Create Account
+                </button>
+            </div>
+
+            <!-- Auth Error Banner -->
+            <div id="auth-error-banner" class="hidden mb-4 p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-700 font-medium"></div>
+
+            <!-- Login / Register Form -->
+            <form id="auth-form" onsubmit="handleAuthSubmit(event)" class="space-y-4">
+                <div id="auth-field-name" class="hidden">
+                    <label class="block text-xs font-bold text-zinc-700 mb-1">Your Full Name</label>
+                    <input type="text" id="auth-name-input" placeholder="e.g. Alex Morgan" class="w-full text-xs font-medium bg-[#FAF9F5] border border-[#EAE7DE] rounded-xl px-4 py-3 focus:outline-hidden focus:border-zinc-900">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-zinc-700 mb-1">Email Address</label>
+                    <input type="email" id="auth-email-input" required placeholder="you@domain.com" class="w-full text-xs font-medium bg-[#FAF9F5] border border-[#EAE7DE] rounded-xl px-4 py-3 focus:outline-hidden focus:border-zinc-900">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-zinc-700 mb-1">Password</label>
+                    <input type="password" id="auth-password-input" required minlength="6" placeholder="••••••••" class="w-full text-xs font-medium bg-[#FAF9F5] border border-[#EAE7DE] rounded-xl px-4 py-3 focus:outline-hidden focus:border-zinc-900">
+                </div>
+
+                <div id="auth-field-style" class="hidden">
+                    <label class="block text-xs font-bold text-zinc-700 mb-1">Primary Style Aesthetic</label>
+                    <select id="auth-style-input" class="w-full text-xs font-medium bg-[#FAF9F5] border border-[#EAE7DE] rounded-xl px-4 py-3 focus:outline-hidden focus:border-zinc-900">
+                        <option value="Contemporary Minimalist">Contemporary Minimalist</option>
+                        <option value="Classic Tailored">Classic Tailored</option>
+                        <option value="Smart Casual">Smart Casual</option>
+                        <option value="Streetwear Luxe">Streetwear Luxe</option>
+                        <option value="Athleisure">Athleisure</option>
+                    </select>
+                </div>
+
+                <button type="submit" id="auth-submit-btn" class="w-full mt-2 py-3.5 bg-zinc-900 hover:bg-zinc-800 text-white font-bold text-xs rounded-xl shadow-md transition flex items-center justify-center gap-2">
+                    Sign In
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Luxury Editorial Footer -->
+    <footer class="bg-white border-t border-[#EAE7DE] pt-16 pb-12 mt-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-10 pb-12 border-b border-[#F0EDE6] text-center md:text-left">
+                <!-- Brand Manifesto Tagline -->
+                <div>
+                    <div class="font-serif text-2xl sm:text-3xl font-extrabold tracking-tight text-zinc-900 leading-tight">
+                        <span class="block">YOUR STYLE.</span>
+                        <span class="block text-zinc-700">YOUR RULES.</span>
+                        <span class="block text-amber-700">YOUR AI.</span>
+                    </div>
+                    <p class="text-xs sm:text-sm text-zinc-500 font-medium mt-3">Personalized styling, powered by AI.</p>
+                </div>
+
+                <!-- Navigation & Contact Us -->
+                <div class="flex flex-col sm:flex-row items-center gap-8 text-xs font-semibold text-zinc-600">
+                    <div class="flex items-center gap-6">
+                        <button onclick="switchTab('wardrobe')" class="hover:text-zinc-900 transition">My Closet</button>
+                        <button onclick="switchTab('recommender')" class="hover:text-zinc-900 transition">Daily Stylist</button>
+                        <button onclick="switchTab('analytics')" class="hover:text-zinc-900 transition">Style DNA</button>
+                    </div>
+
+                    <!-- Contact Us CTA -->
+                    <div class="bg-[#FAF9F5] p-4 rounded-2xl border border-[#EAE7DE] text-center sm:text-left flex items-center gap-4">
+                        <div class="w-10 h-10 rounded-xl bg-zinc-900 text-amber-200 flex items-center justify-center flex-shrink-0 shadow-2xs">
+                            <i data-lucide="mail" class="w-4 h-4"></i>
+                        </div>
+                        <div>
+                            <span class="text-[10px] font-bold text-zinc-400 uppercase tracking-wider block">Have Feedback or Questions?</span>
+                            <a href="mailto:concierge@atelier.com" class="text-xs font-bold text-zinc-900 hover:text-amber-700 transition flex items-center gap-1">
+                                Contact Us <span class="text-zinc-400 font-normal">(atelier@gmail.com)</span> &rarr;
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom Sub-Footer -->
+            <div class="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-zinc-400">
+                <p>&copy; 2026 ATELIER. All rights reserved.</p>
+                <div class="flex items-center gap-6 text-[11px]">
+                    <span class="hover:text-zinc-700 cursor-pointer">Privacy Policy</span>
+                    <span class="hover:text-zinc-700 cursor-pointer">Terms of Service</span>
+                    <span class="text-amber-700 font-semibold">✨ Intelligent Styling Engine</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- App Scripts -->
+    <script src="/static/js/api.js"></script>
+    <script src="/static/js/app.js"></script>
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>

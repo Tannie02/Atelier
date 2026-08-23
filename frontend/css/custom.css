@@ -1,0 +1,101 @@
+/* Luxury Fashion & Editorial Design System */
+
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400;1,600&display=swap');
+
+:root {
+    --bg-sand: #fbfbf9;
+    --card-surface: #ffffff;
+    --text-primary: #18181b;
+    --text-secondary: #71717a;
+    --accent-gold: #c5a880;
+    --accent-indigo: #4f46e5;
+    --border-subtle: #f1f0eb;
+}
+
+body {
+    background-color: var(--bg-sand);
+    color: var(--text-primary);
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    letter-spacing: -0.01em;
+}
+
+.font-serif {
+    font-family: 'Playfair Display', Georgia, serif;
+}
+
+/* Glassmorphism & Luxury Cards */
+.editorial-card {
+    background: #ffffff;
+    border: 1px solid rgba(235, 233, 226, 0.9);
+    box-shadow: 0 4px 20px -2px rgba(24, 24, 27, 0.03), 0 2px 6px -1px rgba(24, 24, 27, 0.02);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.editorial-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 20px 35px -8px rgba(24, 24, 27, 0.07), 0 4px 12px -2px rgba(24, 24, 27, 0.03);
+    border-color: rgba(200, 196, 185, 0.8);
+}
+
+/* Hero Badge */
+.gold-badge {
+    background: linear-gradient(135deg, #fbf7ee 0%, #f4ebd9 100%);
+    border: 1px solid #e7d8bd;
+    color: #8c6d3b;
+}
+
+/* Lookbook Item Grid */
+.lookbook-item-frame {
+    position: relative;
+    border-radius: 16px;
+    background: #fcfbf9;
+    border: 1px solid #f2efe9;
+    overflow: hidden;
+    transition: transform 0.25s ease;
+}
+
+.lookbook-item-frame:hover {
+    transform: scale(1.02);
+}
+
+/* Color Swatches */
+.swatch-pill {
+    transition: all 0.2s ease;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+}
+.swatch-pill:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track {
+    background: #fbfbf9;
+}
+::-webkit-scrollbar-thumb {
+    background: #e4e2db;
+    border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #c8c5ba;
+}
+
+/* Smooth Transitions */
+.tab-transition {
+    animation: fadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

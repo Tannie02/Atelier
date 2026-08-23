@@ -1,0 +1,20 @@
+# Python artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+ENV/
+
+# OS artifacts
+.DS_Store
+Thumbs.db
+
+# Temporary upload files
+backend/uploads/temp/
+
+# PyTorch checkpoints cache (optional)
+.pytest_cache/

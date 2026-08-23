@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  atelier-web:
+    build: .
+    container_name: atelier-ai-platform
+    ports:
+      - "8000:8000"
+    environment:
+      - PORT=8000
+      - HOST=0.0.0.0
+      - JWT_SECRET_KEY=atelier-luxury-fashion-secret-key-2026-very-secure
+      - ENV=production
+    volumes:
+      - ./backend/uploads:/app/backend/uploads
+      - ./backend/wardrobe.db:/app/backend/wardrobe.db
+      - ./ml_training/checkpoints:/app/ml_training/checkpoints
+    restart: unless-stopped
