@@ -1,5 +1,5 @@
 /**
- * ATELIER API Client with Authentication & Bearer Tokens
+ * ATELIER API Client with Authentication, Bearer Tokens & Robust Error Handling
  */
 
 const API_BASE = "";
@@ -29,6 +29,30 @@ const API = {
         return headers;
     },
 
+    async handleResponse(res, defaultErrMsg = "Request failed") {
+        if (!res.ok) {
+            let errorMsg = defaultErrMsg;
+            try {
+                const errData = await res.json();
+                errorMsg = errData.detail || defaultErrMsg;
+            } catch (e) {
+                if (res.status === 401) {
+                    errorMsg = "Please sign in or create an account.";
+                } else if (res.status === 413) {
+                    errorMsg = "Image is too large. Please upload a smaller photo.";
+                } else {
+                    errorMsg = `Server response error (${res.status}). Please retry.`;
+                }
+            }
+            if (res.status === 401) {
+                this.logout();
+                if (typeof renderAuthUI === "function") renderAuthUI(null);
+            }
+            throw new Error(errorMsg);
+        }
+        return await res.json();
+    },
+
     // --- Authentication ---
     async register(email, fullName, password, stylePreference = "Contemporary Minimalist") {
         const res = await fetch(`${API_BASE}/api/auth/register`, {
@@ -41,11 +65,7 @@ const API = {
                 style_preference: stylePreference
             })
         });
-        if (!res.ok) {
-            const err = await res.json();
-            throw new Error(err.detail || "Registration failed");
-        }
-        const data = await res.json();
+        const data = await this.handleResponse(res, "Registration failed");
         this.setToken(data.access_token);
         return data;
     },
@@ -56,11 +76,7 @@ const API = {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ email, password })
         });
-        if (!res.ok) {
-            const err = await res.json();
-            throw new Error(err.detail || "Invalid email or password");
-        }
-        const data = await res.json();
+        const data = await this.handleResponse(res, "Invalid email or password");
         this.setToken(data.access_token);
         return data;
     },
@@ -69,8 +85,7 @@ const API = {
         const res = await fetch(`${API_BASE}/api/auth/me`, {
             headers: this.getAuthHeaders()
         });
-        if (!res.ok) throw new Error("Not authenticated");
-        return await res.json();
+        return await this.handleResponse(res, "Not authenticated");
     },
 
     logout() {
@@ -90,20 +105,12 @@ const API = {
     async uploadPreview(file) {
         const formData = new FormData();
         formData.append("file", file);
-        const headers = {};
-        const token = this.getToken();
-        if (token) headers["Authorization"] = `Bearer ${token}`;
 
         const res = await fetch(`${API_BASE}/api/wardrobe/upload-preview`, {
             method: "POST",
-            headers: headers,
             body: formData
         });
-        if (!res.ok) {
-            const err = await res.json();
-            throw new Error(err.detail || "Failed to analyze image");
-        }
-        return await res.json();
+        return await this.handleResponse(res, "Failed to analyze garment");
     },
 
     async saveItem(itemPayload) {
@@ -112,11 +119,7 @@ const API = {
             headers: this.getAuthHeaders(),
             body: JSON.stringify(itemPayload)
         });
-        if (!res.ok) {
-            const err = await res.json();
-            throw new Error(err.detail || "Failed to save piece");
-        }
-        return await res.json();
+        return await this.handleResponse(res, "Failed to save piece to closet");
     },
 
     async getItems(filters = {}) {
@@ -129,8 +132,7 @@ const API = {
         const res = await fetch(url, {
             headers: this.getAuthHeaders()
         });
-        if (!res.ok) throw new Error("Failed to fetch wardrobe pieces");
-        return await res.json();
+        return await this.handleResponse(res, "Failed to fetch closet pieces");
     },
 
     async deleteItem(itemId) {
@@ -138,8 +140,7 @@ const API = {
             method: "DELETE",
             headers: this.getAuthHeaders()
         });
-        if (!res.ok) throw new Error("Failed to delete piece");
-        return await res.json();
+        return await this.handleResponse(res, "Failed to delete piece");
     },
 
     async getWeather(city = null, lat = null, lon = null) {
@@ -149,8 +150,7 @@ const API = {
         if (lon !== null) params.append("lon", lon);
 
         const res = await fetch(`${API_BASE}/api/weather/current?${params.toString()}`);
-        if (!res.ok) throw new Error("Failed to fetch weather forecast");
-        return await res.json();
+        return await this.handleResponse(res, "Failed to fetch weather");
     },
 
     async getRecommendations(reqData) {
@@ -159,11 +159,7 @@ const API = {
             headers: this.getAuthHeaders(),
             body: JSON.stringify(reqData)
         });
-        if (!res.ok) {
-            const err = await res.json();
-            throw new Error(err.detail || "Failed to generate recommendations");
-        }
-        return await res.json();
+        return await this.handleResponse(res, "Failed to generate recommendations");
     },
 
     async submitFeedback(outfitId, rating, reason = "") {
@@ -176,15 +172,13 @@ const API = {
                 feedback_reason: reason
             })
         });
-        if (!res.ok) throw new Error("Failed to submit feedback");
-        return await res.json();
+        return await this.handleResponse(res, "Failed to submit feedback");
     },
 
     async getFeedbackStats() {
         const res = await fetch(`${API_BASE}/api/feedback/stats`, {
             headers: this.getAuthHeaders()
         });
-        if (!res.ok) throw new Error("Failed to fetch feedback stats");
-        return await res.json();
+        return await this.handleResponse(res, "Failed to fetch feedback stats");
     }
 };

@@ -29,10 +29,7 @@ def get_category_taxonomy():
     return CATEGORY_MAP
 
 @router.post("/upload-preview", response_model=AutoTagPreviewResponse)
-async def upload_preview(
-    file: UploadFile = File(...),
-    current_user: User = Depends(get_current_user)
-):
+async def upload_preview(file: UploadFile = File(...)):
     """
     Accepts an uploaded image, saves it temporarily, and runs AI/ML feature extraction:
     - CLIP zero-shot classification for category & subcategory
@@ -47,6 +44,16 @@ async def upload_preview(
 
     with open(temp_path, "wb") as buffer:
         shutil.copyfileobj(file.file, buffer)
+
+    # Automatically resize very large smartphone photos to max 1200px for speed & memory
+    try:
+        from PIL import Image
+        with Image.open(temp_path) as img:
+            if img.width > 1200 or img.height > 1200:
+                img.thumbnail((1200, 1200))
+                img.save(temp_path, format="JPEG", quality=85)
+    except Exception:
+        pass
 
     # 1. Run CLIP Zero-Shot Classification
     best_match, top_candidates = clip_service.zero_shot_classify(str(temp_path))

@@ -542,6 +542,12 @@ function updateFormalityLabel(val) {
 async function saveConfirmedItem() {
     if (!state.previewItem) return;
 
+    if (!state.currentUser) {
+        showToast("Please sign in or create an account to save this piece!", "info");
+        openAuthModal("register");
+        return;
+    }
+
     const payload = {
         image_filename: state.previewItem.temp_image_url,
         category: document.getElementById("preview-category-select").value,
@@ -674,6 +680,12 @@ async function generateOutfitsHandler() {
     const container = document.getElementById("outfit-results-container");
     const genBtn = document.getElementById("generate-outfits-btn");
     
+    if (!state.currentUser) {
+        showToast("Please sign in or create an account to curate outfits!", "info");
+        openAuthModal("login");
+        return;
+    }
+
     try {
         genBtn.disabled = true;
         genBtn.innerHTML = `<span class="inline-block animate-spin mr-2">✨</span> Styling Lookbook...`;
