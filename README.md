@@ -2,7 +2,6 @@
 
 <div align="center">
 
-![ATELIER Logo](frontend/images/logo.png)
 
 ### *YOUR STYLE. YOUR RULES. YOUR AI.*
 
@@ -42,7 +41,6 @@
 
 ---
 
-<<<<<<< HEAD
 =======
 ## 🛠️ Tech Stack
 
@@ -95,4 +93,4 @@ python test_verification.py
 
 ## 📄 License
 This project is open-source under the MIT License.
->>>>>>> af6b0b8 (Update documentation)
+
