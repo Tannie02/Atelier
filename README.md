@@ -41,7 +41,7 @@
 
 ---
 
-=======
+
 ## 🛠️ Tech Stack
 
 | Layer | Technologies |
